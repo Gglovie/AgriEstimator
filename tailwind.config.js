@@ -10,9 +10,17 @@ module.exports = {
         "lavender": "#D8D2E1",
         "rosy-brown": "#B8E8D",
         "delft-blue": "#34435E",
+        primary: "#217a3b",      // Deep Green
+        secondary: "#43a047",    // Lighter Green
+        accent: "#FFD700",       // Gold
+        bg: "#f6fff7",           // Very light green background
+        card: "#ffffff",         // White for cards
+        border: "#b2dfdb",       // Soft green border
+        text: "#1b3c1a",         // Dark green text
+        muted: "#a5a5a5",        // Muted gray
       },
     },
   },
   plugins: [],
-}
+};
 

@@ -7,10 +7,21 @@ import {
   Modal,
   TextInput,
   Pressable,
-  FlatList,
 } from "react-native";
 import { Feather, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
+
+// New color palette
+const COLORS = {
+  primary: "#217a3b",      // Deep Green
+  secondary: "#43a047",    // Lighter Green
+  accent: "#FFD700",       // Gold
+  bg: "#f6fff7",           // Very light green background
+  card: "#ffffff",         // White for cards
+  border: "#b2dfdb",       // Soft green border
+  text: "#1b3c1a",         // Dark green text
+  muted: "#a5a5a5",        // Muted gray
+};
 
 const initialCrops = ["Yam", "Cassava", "Rice"];
 const defaultCosts = [
@@ -107,76 +118,109 @@ export default function AgrestimatorScreen() {
   };
 
   return (
-    <View className="flex-1 bg-lavender">
-      <ScrollView className="flex-1 px-4 py-6">
+    <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 24, marginBottom: 80 }}>
         {/* Header */}
-        <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-3xl font-extrabold text-savoy-blue tracking-wide">AGRESTIMATOR</Text>
-          <Feather name="search" size={26} color="#1A237E" />
+        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+          <Text style={{
+            fontSize: 32,
+            fontWeight: "bold",
+            color: COLORS.primary,
+            letterSpacing: 1.5,
+          }}>
+            AGRESTIMATOR
+          </Text>
+          <Feather name="search" size={28} color={COLORS.primary} />
         </View>
 
         {/* Crop Selection */}
-        <ScrollView horizontal className="flex-row mb-6 space-x-3">
+        <ScrollView horizontal style={{ flexDirection: "row", marginBottom: 24 }}>
           {crops.map((crop, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => setSelectedCrop(crop)}
-              className={`px-5 py-2 rounded-full border-2 ${
-                selectedCrop === crop
-                  ? 'bg-savoy-blue border-savoy-blue'
-                  : 'bg-white border-tiffany-blue'
-              } shadow-sm`}
               style={{
-                shadowColor: "#1A237E",
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+                borderRadius: 24,
+                borderWidth: 2,
+                borderColor: selectedCrop === crop ? COLORS.primary : COLORS.border,
+                backgroundColor: selectedCrop === crop ? COLORS.primary : COLORS.card,
+                marginRight: 12,
+                shadowColor: COLORS.primary,
                 shadowOpacity: 0.08,
                 shadowRadius: 4,
                 elevation: 2,
               }}
             >
-              <Text className={`text-base font-semibold ${selectedCrop === crop ? 'text-white' : 'text-savoy-blue'}`}>
+              <Text style={{
+                fontSize: 16,
+                fontWeight: "600",
+                color: selectedCrop === crop ? COLORS.accent : COLORS.primary,
+              }}>
                 {crop}
               </Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             onPress={openAddCropModal}
-            className="bg-tiffany-blue px-5 py-2 rounded-full border-2 border-tiffany-blue shadow-sm"
             style={{
-              shadowColor: "#009CA6",
-              shadowOpacity: 0.08,
+              backgroundColor: COLORS.accent,
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 24,
+              borderWidth: 2,
+              borderColor: COLORS.accent,
+              shadowColor: COLORS.accent,
+              shadowOpacity: 0.12,
               shadowRadius: 4,
               elevation: 2,
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Text className="text-base font-bold text-white">+</Text>
+            <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.primary }}>+</Text>
           </TouchableOpacity>
         </ScrollView>
 
         {/* Cost Expenses */}
-        <Text className="text-lg font-bold text-savoy-blue mb-3 tracking-wide">Cost Expenses</Text>
+        <Text style={{
+          fontSize: 20,
+          fontWeight: "bold",
+          color: COLORS.primary,
+          marginBottom: 12,
+          letterSpacing: 1,
+        }}>
+          Cost Expenses
+        </Text>
         {costData[selectedCrop].map((item, index) => (
-          <View key={index} className="mb-4">
-            <View className="bg-white border border-tiffany-blue rounded-2xl px-4 py-3 shadow-sm"
-              style={{
-                shadowColor: "#009CA6",
-                shadowOpacity: 0.07,
-                shadowRadius: 6,
-                elevation: 2,
-              }}>
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className="text-savoy-blue font-semibold text-base">{item.label}</Text>
+          <View key={index} style={{ marginBottom: 16 }}>
+            <View style={{
+              backgroundColor: COLORS.card,
+              borderWidth: 1.5,
+              borderColor: COLORS.border,
+              borderRadius: 18,
+              paddingHorizontal: 18,
+              paddingVertical: 14,
+              shadowColor: COLORS.primary,
+              shadowOpacity: 0.07,
+              shadowRadius: 6,
+              elevation: 2,
+            }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <Text style={{ color: COLORS.primary, fontWeight: "bold", fontSize: 16 }}>{item.label}</Text>
                 <TouchableOpacity
                   onPress={() => openEditModal(index)}
-                  className="p-1"
+                  style={{ padding: 4 }}
                 >
-                  <FontAwesome name="edit" size={20} color="#1A237E" />
+                  <FontAwesome name="edit" size={20} color={COLORS.accent} />
                 </TouchableOpacity>
               </View>
               {item.entries.length === 0 ? (
-                <Text className="text-gray-400 italic">No data entered yet.</Text>
+                <Text style={{ color: COLORS.muted, fontStyle: "italic" }}>No data entered yet.</Text>
               ) : (
                 item.entries.map((entry, i) => (
-                  <Text key={i} className="text-savoy-blue text-sm mb-1">• {entry}</Text>
+                  <Text key={i} style={{ color: COLORS.secondary, fontSize: 14, marginBottom: 2 }}>• {entry}</Text>
                 ))
               )}
             </View>
@@ -186,55 +230,90 @@ export default function AgrestimatorScreen() {
         {/* Add Cost Component */}
         <TouchableOpacity
           onPress={openAddCostModal}
-          className="bg-tiffany-blue py-3 mt-2 rounded-xl shadow-lg"
           style={{
-            shadowColor: "#009CA6",
+            backgroundColor: COLORS.accent,
+            paddingVertical: 14,
+            marginTop: 8,
+            borderRadius: 16,
+            shadowColor: COLORS.accent,
             shadowOpacity: 0.15,
             shadowRadius: 8,
             elevation: 3,
           }}
         >
-          <Text className="text-center font-bold text-lg text-white tracking-wide">+ Add Cost Component</Text>
+          <Text style={{
+            textAlign: "center",
+            fontWeight: "bold",
+            fontSize: 18,
+            color: COLORS.primary,
+            letterSpacing: 1,
+          }}>
+            + Add Cost Component
+          </Text>
         </TouchableOpacity>
 
         {/* Total Cost Summary */}
-        <View className="mt-8 p-5 bg-rosy-brown rounded-2xl border-2 border-tiffany-blue shadow"
-          style={{
-            shadowColor: "#009CA6",
-            shadowOpacity: 0.10,
-            shadowRadius: 8,
-            elevation: 2,
+        <View style={{
+          marginTop: 32,
+          marginBottom: 32,
+          padding: 22,
+          backgroundColor: COLORS.secondary,
+          borderRadius: 18,
+          borderWidth: 2,
+          borderColor: COLORS.accent,
+          shadowColor: COLORS.primary,
+          shadowOpacity: 0.10,
+          shadowRadius: 8,
+          elevation: 2,
+        }}>
+          <Text style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            color: COLORS.card,
+            marginBottom: 6,
+            letterSpacing: 1,
           }}>
-          <Text className="text-xl font-bold text-savoy-blue mb-2 tracking-wide">Total Cost Summary</Text>
-          <Text className="text-3xl font-extrabold text-tiffany-blue">₦{calculateTotal().toLocaleString()}</Text>
+            Total Cost Summary
+          </Text>
+          <Text style={{
+            fontSize: 32,
+            fontWeight: "bold",
+            color: COLORS.accent,
+            letterSpacing: 1,
+          }}>
+            ₦{calculateTotal().toLocaleString()}
+          </Text>
         </View>
 
         {/* Modal */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
-          <View className="flex-1 justify-center items-center bg-black/40">
-            <View className="bg-white w-11/12 p-6 rounded-2xl shadow-xl"
-              style={{
-                shadowColor: "#1A237E",
-                shadowOpacity: 0.15,
-                shadowRadius: 12,
-                elevation: 6,
-              }}>
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#0008" }}>
+            <View style={{
+              backgroundColor: COLORS.card,
+              width: "92%",
+              padding: 24,
+              borderRadius: 20,
+              shadowColor: COLORS.primary,
+              shadowOpacity: 0.15,
+              shadowRadius: 12,
+              elevation: 6,
+            }}>
               {modalType === "edit" && (
                 <>
-                  <Text className="text-lg font-bold text-savoy-blue mb-3">
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.primary, marginBottom: 12 }}>
                     {costData[selectedCrop][editingIndex]?.label}
                   </Text>
                   {/* Show entry history */}
-                  <View className="mb-3 max-h-32">
+                  <View style={{ marginBottom: 12, maxHeight: 120 }}>
                     {costData[selectedCrop][editingIndex]?.entries.length === 0 ? (
-                      <Text className="text-gray-400 italic">No history yet.</Text>
+                      <Text style={{ color: COLORS.muted, fontStyle: "italic" }}>No history yet.</Text>
                     ) : (
                       costData[selectedCrop][editingIndex]?.entries.map((entry, i) => (
-                        <Text key={i} className="text-savoy-blue text-sm mb-1">• {entry}</Text>
+                        <Text key={i} style={{ color: COLORS.secondary, fontSize: 14, marginBottom: 2 }}>• {entry}</Text>
                       ))
                     )}
                   </View>
-                  <Text className="text-base font-semibold text-gray-700 mb-1">
+                  <Text style={{ fontSize: 15, fontWeight: "600", color: COLORS.text, marginBottom: 4 }}>
                     {costData[selectedCrop][editingIndex]?.label === "Number of hours worked"
                       ? "Add hours worked"
                       : "Add amount"}
@@ -248,41 +327,79 @@ export default function AgrestimatorScreen() {
                         ? "e.g. 4"
                         : "e.g. 5000"
                     }
-                    className="border border-tiffany-blue px-4 py-2 rounded-lg mb-4 bg-lavender"
-                    placeholderTextColor="#B0B0B0"
+                    style={{
+                      borderWidth: 1.5,
+                      borderColor: COLORS.accent,
+                      paddingHorizontal: 16,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      marginBottom: 16,
+                      backgroundColor: COLORS.bg,
+                      color: COLORS.text,
+                    }}
+                    placeholderTextColor={COLORS.muted}
                   />
                 </>
               )}
               {modalType === "crop" && (
                 <>
-                  <Text className="text-lg font-bold text-savoy-blue mb-3">Add a New Crop</Text>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.primary, marginBottom: 12 }}>Add a New Crop</Text>
                   <TextInput
                     value={newCropName}
                     onChangeText={setNewCropName}
                     placeholder="Enter crop name"
-                    className="border border-tiffany-blue px-4 py-2 rounded-lg mb-4 bg-lavender"
-                    placeholderTextColor="#B0B0B0"
+                    style={{
+                      borderWidth: 1.5,
+                      borderColor: COLORS.accent,
+                      paddingHorizontal: 16,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      marginBottom: 16,
+                      backgroundColor: COLORS.bg,
+                      color: COLORS.text,
+                    }}
+                    placeholderTextColor={COLORS.muted}
                   />
                 </>
               )}
               {modalType === "cost" && (
                 <>
-                  <Text className="text-lg font-bold text-savoy-blue mb-3">Add a New Cost Component</Text>
+                  <Text style={{ fontSize: 18, fontWeight: "bold", color: COLORS.primary, marginBottom: 12 }}>Add a New Cost Component</Text>
                   <TextInput
                     value={newCostLabel}
                     onChangeText={setNewCostLabel}
                     placeholder="e.g. Transportation"
-                    className="border border-tiffany-blue px-4 py-2 rounded-lg mb-4 bg-lavender"
-                    placeholderTextColor="#B0B0B0"
+                    style={{
+                      borderWidth: 1.5,
+                      borderColor: COLORS.accent,
+                      paddingHorizontal: 16,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      marginBottom: 16,
+                      backgroundColor: COLORS.bg,
+                      color: COLORS.text,
+                    }}
+                    placeholderTextColor={COLORS.muted}
                   />
                 </>
               )}
-              <View className="flex-row justify-end space-x-3 mt-2">
-                <Pressable onPress={() => setModalVisible(false)} className="px-5 py-2 bg-gray-200 rounded-lg">
-                  <Text className="font-semibold text-savoy-blue">Cancel</Text>
+              <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 8 }}>
+                <Pressable onPress={() => setModalVisible(false)} style={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.border,
+                  borderRadius: 10,
+                  marginRight: 10,
+                }}>
+                  <Text style={{ fontWeight: "600", color: COLORS.primary }}>Cancel</Text>
                 </Pressable>
-                <Pressable onPress={handleSave} className="px-5 py-2 bg-savoy-blue rounded-lg">
-                  <Text className="font-semibold text-white">Save</Text>
+                <Pressable onPress={handleSave} style={{
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.primary,
+                  borderRadius: 10,
+                }}>
+                  <Text style={{ fontWeight: "600", color: COLORS.accent }}>Save</Text>
                 </Pressable>
               </View>
             </View>
@@ -292,33 +409,40 @@ export default function AgrestimatorScreen() {
 
       {/* Fixed Bottom Navigation */}
       <View
-        className="flex-row justify-around py-4 border-t-2 border-tiffany-blue bg-white rounded-t-2xl shadow"
         style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          paddingVertical: 16,
+          borderTopWidth: 2,
+          borderTopColor: COLORS.accent,
+          backgroundColor: COLORS.card,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          shadowColor: COLORS.primary,
+          shadowOpacity: 0.10,
+          shadowRadius: 8,
+          elevation: 2,
           position: "absolute",
           left: 0,
           right: 0,
           bottom: 0,
-          shadowColor: "#009CA6",
-          shadowOpacity: 0.10,
-          shadowRadius: 8,
-          elevation: 2,
         }}
       >
-        <TouchableOpacity className="items-center">
-          <FontAwesome name="home" size={26} color="#1A237E" />
-          <Text className="text-savoy-blue text-xs mt-1 font-semibold">Home</Text>
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <FontAwesome name="home" size={26} color={COLORS.primary} />
+          <Text style={{ color: COLORS.primary, fontSize: 12, marginTop: 4, fontWeight: "bold" }}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <Feather name="search" size={26} color="#1A237E" />
-          <Text className="text-savoy-blue text-xs mt-1 font-semibold" onPress={() => navigation.navigate("index1")}>Search</Text>
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <Feather name="search" size={26} color={COLORS.primary} />
+          <Text style={{ color: COLORS.primary, fontSize: 12, marginTop: 4, fontWeight: "bold" }} onPress={() => navigation.navigate("index1")}>Search</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center" onPress={() => navigation.navigate("MarketTrends")}>
-          <MaterialCommunityIcons name="chart-line" size={26} color="#1A237E" />
-          <Text className="text-savoy-blue text-xs mt-1 font-semibold" >Market Trends</Text>
+        <TouchableOpacity style={{ alignItems: "center" }} onPress={() => navigation.navigate("MarketTrends")}>
+          <MaterialCommunityIcons name="chart-line" size={26} color={COLORS.primary} />
+          <Text style={{ color: COLORS.primary, fontSize: 12, marginTop: 4, fontWeight: "bold" }}>Market Trends</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="items-center">
-          <FontAwesome name="user-circle" size={26} color="#1A237E" />
-          <Text className="text-savoy-blue text-xs mt-1 font-semibold">Profile</Text>
+        <TouchableOpacity style={{ alignItems: "center" }}>
+          <FontAwesome name="user-circle" size={26} color={COLORS.primary} />
+          <Text style={{ color: COLORS.primary, fontSize: 12, marginTop: 4, fontWeight: "bold" }}>Profile</Text>
         </TouchableOpacity>
       </View>
     </View>
