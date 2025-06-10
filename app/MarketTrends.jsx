@@ -1,6 +1,10 @@
 import React, { useState } from "react";
+import { get_user, get_user_costs_and_hours } from "./utils";
 import { View, Text, TouchableOpacity, ScrollView, Dimensions, TextInput } from "react-native";
 import { LineChart } from "react-native-chart-kit";
+
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserId, clearUserId } from './features/authSlice';
 
 // Use the same palette as index.jsx
 const COLORS = {
@@ -17,9 +21,7 @@ const COLORS = {
 const TABS = ["Price Analysis", "User Analysis"];
 
 export default function MarketTrends({
-  userData = [],
-  costLogs = [],
-  crops = ["Yam", "Cassava", "Rice"],
+  userId,
   priceTrends = {
     Yam: [
       { date: "2024-06-01", price: 1200 },
@@ -40,49 +42,37 @@ export default function MarketTrends({
       { date: "2024-06-22", price: 2000 },
     ],
   },
-  userHours = {
-    Yam: [
-      { date: "2024-06-01", hours: 4 },
-      { date: "2024-06-08", hours: 6 },
-      { date: "2024-06-15", hours: 5 },
-      { date: "2024-06-22", hours: 7 },
-    ],
-    Cassava: [
-      { date: "2024-06-01", hours: 2 },
-      { date: "2024-06-08", hours: 3 },
-      { date: "2024-06-15", hours: 4 },
-      { date: "2024-06-22", hours: 5 },
-    ],
-    Rice: [
-      { date: "2024-06-01", hours: 5 },
-      { date: "2024-06-08", hours: 5 },
-      { date: "2024-06-15", hours: 6 },
-      { date: "2024-06-22", hours: 7 },
-    ],
-  },
-  userCosts = {
-    Yam: [
-      { date: "2024-06-01", totalCost: 5000 },
-      { date: "2024-06-08", totalCost: 8000 },
-      { date: "2024-06-15", totalCost: 6500 },
-      { date: "2024-06-22", totalCost: 9000 },
-    ],
-    Cassava: [
-      { date: "2024-06-01", totalCost: 2000 },
-      { date: "2024-06-08", totalCost: 3000 },
-      { date: "2024-06-15", totalCost: 3500 },
-      { date: "2024-06-22", totalCost: 4000 },
-    ],
-    Rice: [
-      { date: "2024-06-01", totalCost: 7000 },
-      { date: "2024-06-08", totalCost: 9000 },
-      { date: "2024-06-15", totalCost: 9500 },
-      { date: "2024-06-22", totalCost: 10000 },
-    ],
-  },
 }) {
+  // State for dynamic crops, user, userCosts, userHours
+  const [crops, setCrops] = useState([]);
+  const [user, setUser] = useState("");
+  const [userCosts, setUserCosts] = useState({});
+  const [userHours, setUserHours] = useState({});
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedCrop, setSelectedCrop] = useState(crops[0]);
+  const [selectedCrop, setSelectedCrop] = useState("");
+
+  const dispatch = useDispatch();
+  const _userId = useSelector((state) => state.auth.userId);
+  // Fetch crops, user, userCosts, userHours on mount
+  React.useEffect(() => {
+    const fetchData = async () => {
+      // Replace with your actual API call functions
+      const res = await get_user(_userId);
+      if (res.status && res.data.status_code === 200) {
+        const loadedCrops = res.data.user.crops || [];
+        setCrops(loadedCrops);
+        setUser(res.data.user.name);
+        if (loadedCrops.length > 0) setSelectedCrop(loadedCrops[0].name);
+      }
+      // Fetch userCosts and userHours from another endpoint
+      const costRes = await get_user_costs_and_hours(_userId);
+      if (costRes.status && costRes.data.status_code === 200) {
+        setUserCosts(costRes.data.userCosts || {});
+        setUserHours(costRes.data.userHours || {});
+      }
+    };
+    fetchData();
+  }, [userId]);
 
   // New state for yam size inputs
   const [bigCount, setBigCount] = useState("");
@@ -97,8 +87,8 @@ export default function MarketTrends({
 
   // Get current total cost
   const currentTotalCost =
-    userCosts[selectedCrop] && userCosts[selectedCrop].length > 0
-      ? userCosts[selectedCrop][userCosts[selectedCrop].length - 1].totalCost
+    cropCostData && cropCostData.length > 0
+      ? cropCostData[cropCostData.length - 1].totalCost
       : 0;
 
   // Calculate total tubers and cost per tuber by size
@@ -153,7 +143,7 @@ export default function MarketTrends({
       <ScrollView horizontal style={{ flexDirection: "row", marginBottom: 18 }}>
         {crops.map((crop, idx) => (
           <TouchableOpacity
-            key={crop}
+            key={crop.id}
             onPress={() => setSelectedCrop(crop)}
             style={{
               height: 45,
@@ -174,7 +164,7 @@ export default function MarketTrends({
               fontWeight: "600",
               color: selectedCrop === crop ? COLORS.accent : COLORS.primary,
             }}>
-              {crop}
+              {crop.name}
             </Text>
           </TouchableOpacity>
         ))}
