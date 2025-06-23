@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { create_crop, get_user, create_cost, calc_fair_share } from "./utils";
 import { defaultCosts } from "./home";
+import BottomNav from "./components/BottomNav";
 
 const COLORS = {
   primary: "#217a3b",
@@ -88,24 +89,16 @@ export default function MarketTrends() {
   };
 
   // Crop-specific data
-  const cropHoursData = Array.isArray(userHours[selectedCrop])
-    ? userHours[selectedCrop]
-    : [];
+  const cropHoursData = Array.isArray(userHours[selectedCrop]) ? userHours[selectedCrop] : [];
   // Fix: support both 'totalCost' and 'price' as the cost field (API may return either)
-  const cropCostData = Array.isArray(userCosts[selectedCrop])
-    ? userCosts[selectedCrop]
-    : [];
+  const cropCostData = Array.isArray(userCosts[selectedCrop]) ? userCosts[selectedCrop] : [];
   // Use 'price' if present, else 'totalCost'
   const getCostValue = (d) =>
-    typeof d.price === "number"
-      ? d.price
-      : typeof d.totalCost === "number"
-      ? d.totalCost
-      : 0;
-  const currentTotalCost =
-    cropCostData.length > 0
-      ? getCostValue(cropCostData[cropCostData.length - 1])
-      : 0;
+    typeof d.price === "number" ? d.price : typeof d.totalCost === "number" ? d.totalCost : 0;
+
+  // Sum all prices for currentTotalCost
+  const currentTotalCost = cropCostData.reduce((sum, d) => sum + getCostValue(d), 0);
+  // const currentTotalCost = cropCostData.length > 0 ? getCostValue(cropCostData[cropCostData.length - 1]) : 0;
 
   // For price trend chart (always the same dummy data)
   const priceLabels = priceTrends.map((d) => d.date.slice(5));
@@ -120,8 +113,7 @@ export default function MarketTrends() {
             return `${dt.getMonth() + 1}-${dt.getDate()}`;
           }
           return "-";
-        })
-      : [];
+        }) : [];
   const hoursData =
     cropHoursData.length > 0 ? cropHoursData.map((d) => d.hours) : [];
 
@@ -134,8 +126,7 @@ export default function MarketTrends() {
             return `${dt.getMonth() + 1}-${dt.getDate()}`;
           }
           return "-";
-        })
-      : [];
+        }) : [];
   const costData =
     cropCostData.length > 0 ? cropCostData.map(getCostValue) : [];
 
@@ -146,12 +137,14 @@ export default function MarketTrends() {
   }
 
   return (
-    <View
+    <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <ScrollView
       style={{
         flex: 1,
         backgroundColor: COLORS.bg,
         paddingHorizontal: 16,
-        paddingTop: 24,
+        paddingTop: 24, 
+        marginBottom: 100,
       }}
     >
       {/* Crop Selector */}
@@ -683,6 +676,8 @@ export default function MarketTrends() {
           </Text>
         </ScrollView>
       )}
+    </ScrollView>
+    <BottomNav/>
     </View>
   );
 }

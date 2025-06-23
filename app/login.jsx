@@ -39,7 +39,7 @@ export default function SignInScreen() {
 
     if (res.status === 200 && res.data.status_code === 200 ){
       dispatch(setUserId(res.data.id))
-      Alert.alert('Success', 'Account created successfully');
+      Alert.alert('Success', 'Login successfully');
       setTimeout(() => {
         navigation.navigate('home');
         

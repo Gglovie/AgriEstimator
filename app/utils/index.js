@@ -37,7 +37,7 @@ export const register = async (data) => {
   try {
     const res = await axios.post(
       API_BASE_URL + "register",
-      { ...data, id: gen_rand() },
+      { ...data },
       {
         headers: { "Content-Type": "application/json" },
       }
@@ -91,7 +91,7 @@ export const calc_fair_share = async (id, crop, unit) => {
 // };
 export const create_crop = async (id, name) => {
     const crop = {
-        id: gen_rand(),
+        id: name,
         name: name
       }
     //   const data = {"user_id":id, "crop_id": crop.id, "crop_name": crop.name}

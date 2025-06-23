@@ -16,8 +16,10 @@ import {
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { setUserId, clearUserId } from './features/authSlice';
 
 import { create_crop, get_user, create_cost } from "./utils";
+import BottomNav from "./components/BottomNav";
 
 // New color palette
 const COLORS = {
@@ -32,7 +34,7 @@ const COLORS = {
 };
 
 // const initialCrops = ["Yam", "Cassava", "Rice"];
-const initialCrops = [{ id: "testtt", name: "Yam" }];
+const initialCrops = [];
 export const defaultCosts = [
   { label: "Number of hours worked", entries: [] },
   { label: "Labour cost", entries: [] },
@@ -43,6 +45,9 @@ export const defaultCosts = [
 ];
 
 export default function AgrestimatorScreen() {
+  const dispatch = useDispatch();
+  const nav = useNavigation()
+
   const [crops, setCrops] = useState(initialCrops);
   const [selectedCrop, setSelectedCrop] = useState(
     crops.length > 0 ? crops[0] : null
@@ -60,7 +65,7 @@ export default function AgrestimatorScreen() {
   const [user, setUser] = useState("");
   const [newCropName, setNewCropName] = useState("");
   const [newCostLabel, setNewCostLabel] = useState("");
-  const navigation = useNavigation();
+  const [showMenu, setShowMenu] = useState(false);
 
   // const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.userId);
@@ -236,6 +241,12 @@ export default function AgrestimatorScreen() {
     }
   };
 
+  const handleLogout = () => {
+    dispatch(clearUserId());
+    setShowMenu(false);
+    nav.navigate('index');
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
       <ScrollView
@@ -263,9 +274,37 @@ export default function AgrestimatorScreen() {
               letterSpacing: 1.5,
             }}
           >
-           Hello {user}
+            Hello, {user}
           </Text>
-          <Feather name="search" size={28} color={COLORS.primary} />
+          <View style={{ position: 'relative' }}>
+            <TouchableOpacity onPress={() => setShowMenu((v) => !v)}>
+              <Feather name="menu" size={28} color={COLORS.primary} />
+            </TouchableOpacity>
+            {showMenu && (
+              <View style={{
+                position: 'absolute',
+                top: 36,
+                right: 0,
+                backgroundColor: COLORS.card,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: COLORS.border,
+                shadowColor: COLORS.primary,
+                shadowOpacity: 0.08,
+                shadowRadius: 6,
+                elevation: 4,
+                minWidth: 100,
+                zIndex: 100,
+              }}>
+                <TouchableOpacity
+                  onPress={handleLogout}
+                  style={{ paddingVertical: 10, paddingHorizontal: 18 }}
+                >
+                  <Text style={{ color: COLORS.primary, fontWeight: 'bold', fontSize: 16, textAlign: 'center' }}>Log out</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Crop Selection */}
@@ -411,7 +450,8 @@ export default function AgrestimatorScreen() {
                       • {entry}
                     </Text>
                   ))
-                )}
+                )
+                }
               </View>
             </View>
           ))}
@@ -738,90 +778,8 @@ export default function AgrestimatorScreen() {
       </ScrollView>
 
       {/* Fixed Bottom Navigation */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          paddingVertical: 16,
-          borderTopWidth: 2,
-          borderTopColor: COLORS.accent,
-          backgroundColor: COLORS.card,
-          borderTopLeftRadius: 24,
-          borderTopRightRadius: 24,
-          shadowColor: COLORS.primary,
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 2,
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-        }}
-      >
-        <TouchableOpacity style={{ alignItems: "center" }}>
-          <FontAwesome name="home" size={26} color={COLORS.primary} />
-          <Text
-            style={{
-              color: COLORS.primary,
-              fontSize: 12,
-              marginTop: 4,
-              fontWeight: "bold",
-            }}
-          >
-            Home
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ alignItems: "center" }}
-          onPress={() => navigation.navigate("login")}
-        >
-          <Feather name="search" size={26} color={COLORS.primary} />
-          <Text
-            style={{
-              color: COLORS.primary,
-              fontSize: 12,
-              marginTop: 4,
-              fontWeight: "bold",
-            }}
-            onPress={() => navigation.navigate("index1")}
-          >
-            Search
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ alignItems: "center" }}
-          onPress={() => navigation.navigate("MarketTrends")}
-        >
-          <MaterialCommunityIcons
-            name="chart-line"
-            size={26}
-            color={COLORS.primary}
-          />
-          <Text
-            style={{
-              color: COLORS.primary,
-              fontSize: 12,
-              marginTop: 4,
-              fontWeight: "bold",
-            }}
-          >
-            Market Trends
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: "center" }}>
-          <FontAwesome name="user-circle" size={26} color={COLORS.primary} />
-          <Text
-            style={{
-              color: COLORS.primary,
-              fontSize: 12,
-              marginTop: 4,
-              fontWeight: "bold",
-            }}
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNav/>
+      
     </View>
   );
 }

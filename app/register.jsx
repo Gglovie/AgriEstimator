@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, Button, SafeAreaView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import { register } from './utils';
+import { register, gen_rand } from './utils';
 // import { id } from 'paths-js/ops';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -36,12 +36,13 @@ export default function SignUpScreen() {
       return;
     }
 
-    const res = await register({username: username, phone:phone, email:email, password:password})
+    const usr = gen_rand()
+    const res = await register({username: username, phone:phone, email:email, password:password, id: usr})
 
     // console.log(res)
 
     if (res.status === 200 && res.data.status_code === 200 ){
-      dispatch(setUserId(res.data.id))
+      dispatch(setUserId(usr))
       Alert.alert('Success', 'Account created successfully');
       setTimeout(() => {
         navigation.navigate('home');
