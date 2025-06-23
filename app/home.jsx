@@ -7,6 +7,7 @@ import {
   Modal,
   TextInput,
   Pressable,
+  Alert
 } from "react-native";
 import {
   Feather,
@@ -32,7 +33,7 @@ const COLORS = {
 
 // const initialCrops = ["Yam", "Cassava", "Rice"];
 const initialCrops = [{ id: "testtt", name: "Yam" }];
-const defaultCosts = [
+export const defaultCosts = [
   { label: "Number of hours worked", entries: [] },
   { label: "Labour cost", entries: [] },
   { label: "Cost of seeds", entries: [] },
@@ -200,7 +201,9 @@ export default function AgrestimatorScreen() {
   };
 
   const calculateTotal = () => {
-    if (!selectedCrop || !costData[selectedCrop.name]) return 0;
+    if (!selectedCrop || !costData[selectedCrop.name]) {
+      return 0;
+    }
     return costData[selectedCrop.name].reduce((total, item) => {
       const sum = item.entries.reduce((entryTotal, entry) => {
         if (item.label === "Number of hours worked") {
@@ -226,8 +229,7 @@ export default function AgrestimatorScreen() {
   const handleSubmit = async () => {
     const submission = prepareCostSubmission();
     // console.log('Submitting cost data:', submission);
-    console.log(calculateTotal());
-    const res = await create_cost({uid: userId, crop: selectedCrop.id, total: calculateTotal || 0, expense: submission});
+    const res = await create_cost({uid: userId, crop: selectedCrop.id, total: calculateTotal() || 0, expense: submission});
     console.log(res)
     if(res.status && res.data.status_code === 200){
       Alert.alert('Success', 'Expense logged successfully');
@@ -261,7 +263,7 @@ export default function AgrestimatorScreen() {
               letterSpacing: 1.5,
             }}
           >
-            AGRESTIMATOR {user}
+           Hello {user}
           </Text>
           <Feather name="search" size={28} color={COLORS.primary} />
         </View>

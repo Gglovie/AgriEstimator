@@ -44,6 +44,7 @@ export default function RootLayout() {
           <Stack.Screen name="register" />
           <Stack.Screen name="home" />  
           <Stack.Screen name="MarketTrends" />
+          <Stack.Screen name="MarketTrends-old" />
         </Stack>
       </PersistGate>
     </Provider>

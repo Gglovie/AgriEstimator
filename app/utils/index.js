@@ -48,6 +48,7 @@ export const register = async (data) => {
   }
 };
 export const create_cost = async (data) => {
+    console.log(data);
   try {
     const res = await axios.post(
       API_BASE_URL + "cost/create",
@@ -75,6 +76,19 @@ export const calc_fair_share = async (id, crop, unit) => {
     console.log(error);
   }
 };
+// export const calc_market_trends = async (id, crop, unit) => {
+//   try {
+//     const res = await axios.get(
+//       API_BASE_URL + `calculate-market-trend?user_id=${id}&units=${unit}&crop=${crop}`,
+//       {
+//         headers: { "Content-Type": "application/json" },
+//       }
+//     );
+//     return res;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 export const create_crop = async (id, name) => {
     const crop = {
         id: gen_rand(),
